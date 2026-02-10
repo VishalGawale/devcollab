@@ -1,6 +1,6 @@
 # DevCollab Project Status
 
-**Repository:** https://github.com/YOUR_USERNAME/devcollab
+**Repository:** https://github.com/VishalGawale/devcollab
 **Current Date:** 2024-02-10
 **Total Hours Invested:** 4-5
 
