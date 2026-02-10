@@ -1,10 +1,11 @@
 # DevCollab
 
-&gt; Unified developer team collaboration dashboard aggregating GitHub activity, CI/CD status, and sprint progress.
+> Unified developer team collaboration dashboard aggregating GitHub activity, CI/CD status, and sprint progress.
 
 ## Problem Statement
 
 Engineering teams waste 2-3 hours daily context-switching between:
+
 - GitHub (PRs, reviews)
 - CI/CD dashboards (GitHub Actions, Jenkins)
 - Project management tools (Jira)
@@ -16,10 +17,11 @@ Engineering teams waste 2-3 hours daily context-switching between:
 
 ```mermaid
 graph TB
-    User[Developer] --&gt;|HTTPS| Ingress[Ingress Controller]
-    Ingress --&gt; Frontend[React Frontend]
-    Ingress --&gt; Backend[Node.js API]
-    Backend --&gt; Postgres[(PostgreSQL)]
-    Backend --&gt; Redis[(Redis)]
-    Backend --&gt; GitHub[GitHub API]
-    GitHub --&gt;|Webhooks| Backend
+    User[Developer] -->|HTTPS| Ingress[Ingress Controller]
+    Ingress --> Frontend[React Frontend]
+    Ingress --> Backend[Node.js API]
+    Backend --> Postgres[(PostgreSQL)]
+    Backend --> Redis[(Redis)]
+    Backend --> GitHub[GitHub API]
+    GitHub -->|Webhooks| Backend
+```
