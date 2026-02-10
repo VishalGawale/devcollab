@@ -1,0 +1,13 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "ms-azuretools.vscode-docker",
+    "hashicorp.terraform",
+    "ms-kubernetes-tools.vscode-kubernetes-tools",
+    "rangav.vscode-thunder-client",
+    "eamodio.gitlens",
+    "prisma.prisma",
+    "usernamehw.errorlens"
+  ]
+}

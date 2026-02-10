@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Infrastructure
+*.tfstate
+*.tfstate.*
+.terraform/
+*.pem
+kubeconfig
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build outputs
+dist/
+build/
+coverage/
