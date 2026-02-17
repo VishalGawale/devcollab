@@ -1,6 +1,7 @@
 ﻿import Fastify from 'fastify';
 import { prisma } from './utils/prisma';
 import { userRoutes } from './routes/users';
+import { authRoutes } from './routes/auth';
 
 const app = Fastify({ logger: true });
 
@@ -21,6 +22,7 @@ app.get('/health/db', async () => {
 
 // API Routes
 app.register(userRoutes, { prefix: '/users' });
+app.register(authRoutes);
 
 app.listen({ port: 3002, host: '0.0.0.0' }, (err) => {
   if (err) {
@@ -28,5 +30,12 @@ app.listen({ port: 3002, host: '0.0.0.0' }, (err) => {
     process.exit(1);
   }
   console.log('Server running at http://localhost:3002');
-  console.log('Routes: /health, /health/db, /users');
+  console.log('Routes:');
+  console.log('  GET  /health');
+  console.log('  GET  /health/db');
+  console.log('  GET  /users');
+  console.log('  POST /users');
+  console.log('  GET  /auth/github         - Start GitHub login');
+  console.log('  GET  /auth/github/callback - GitHub callback');
+  console.log('  GET  /me                  - Get current user (requires auth)');
 });
