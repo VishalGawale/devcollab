@@ -16,7 +16,6 @@ model User {
   username  String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
   @@map("users")
 }
 
@@ -27,6 +26,23 @@ model Team {
   githubOrgId String?  @unique
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
+  repositories Repository[]
   @@map("teams")
 }
+
+model Repository {
+  id          String   @id @default(cuid())
+  githubId    String   @unique
+  name        String
+  fullName    String   @unique
+  description String?
+  private     Boolean  @default(false)
+  defaultBranch String @default("main")
+  teamId      String
+  team        Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  lastSyncedAt DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  @@map("repositories")
+}
+

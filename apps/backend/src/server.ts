@@ -2,6 +2,7 @@
 import { prisma } from './utils/prisma';
 import { userRoutes } from './routes/users';
 import { authRoutes } from './routes/auth';
+import { githubRoutes } from './routes/github';
 
 const app = Fastify({ logger: true });
 
@@ -23,6 +24,7 @@ app.get('/health/db', async () => {
 // API Routes
 app.register(userRoutes, { prefix: '/users' });
 app.register(authRoutes);
+app.register(githubRoutes);
 
 app.listen({ port: 3002, host: '0.0.0.0' }, (err) => {
   if (err) {
@@ -35,7 +37,9 @@ app.listen({ port: 3002, host: '0.0.0.0' }, (err) => {
   console.log('  GET  /health/db');
   console.log('  GET  /users');
   console.log('  POST /users');
-  console.log('  GET  /auth/github         - Start GitHub login');
-  console.log('  GET  /auth/github/callback - GitHub callback');
-  console.log('  GET  /me                  - Get current user (requires auth)');
+  console.log('  GET  /auth/github');
+  console.log('  GET  /auth/github/callback');
+  console.log('  GET  /me');
+  console.log('  GET  /github/orgs          - List GitHub organizations');
+  console.log('  POST /github/sync/:org     - Sync repositories from org');
 });
