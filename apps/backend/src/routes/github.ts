@@ -1,8 +1,7 @@
-﻿import { FastifyInstance } from "fastify";
+import { FastifyInstance } from "fastify";
 import { GitHubService } from "../services/github";
 
 export async function githubRoutes(app: FastifyInstance) {
-  // GET /github/test - Simple test
   app.get("/test", async (request, reply) => {
     try {
       const authHeader = request.headers.authorization;
@@ -20,7 +19,6 @@ export async function githubRoutes(app: FastifyInstance) {
     }
   });
 
-  // GET /github/orgs - List organizations
   app.get("/orgs", async (request, reply) => {
     try {
       const authHeader = request.headers.authorization;
@@ -31,9 +29,7 @@ export async function githubRoutes(app: FastifyInstance) {
 
       const token = authHeader.replace("Bearer ", "");
       const github = new GitHubService(token);
-
-      const orgs = await github.getOrganizations();
-      return orgs;
+      return github.getOrganizations();
     } catch (error) {
       reply.status(500);
       return {
@@ -43,11 +39,11 @@ export async function githubRoutes(app: FastifyInstance) {
     }
   });
 
-  // POST /github/sync/:org - Sync repositories
   app.post("/sync/:org", async (request, reply) => {
-    try {
-      const { org } = request.params as { org: string };
+    const { org } = request.params as { org: string };
+    app.log.info({ org }, "Starting GitHub sync for org");
 
+    try {
       const authHeader = request.headers.authorization;
       if (!authHeader) {
         reply.status(401);
@@ -56,17 +52,19 @@ export async function githubRoutes(app: FastifyInstance) {
 
       const token = authHeader.replace("Bearer ", "");
       const github = new GitHubService(token);
-
       const repos = await github.syncRepositories(org, "placeholder-team-id");
 
       reply.status(201);
       return {
-        message: `Synced ${repos.length} repositories from ${org}`,
+        status: "ok",
+        org,
+        message: `Synced ${repos.length} repositories`,
         count: repos.length,
       };
     } catch (error) {
+      app.log.error(error, "Failed to sync GitHub org");
       reply.status(500);
-      return { error: "Failed to sync", message: (error as Error).message };
+      return { error: "Sync failed", message: (error as Error).message };
     }
   });
 }

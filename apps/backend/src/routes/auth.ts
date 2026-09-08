@@ -33,14 +33,14 @@ export async function authRoutes(app: FastifyInstance) {
       },
       auth: oauth2.GITHUB_CONFIGURATION,
     },
-    startRedirectPath: "/auth/github",
+    startRedirectPath: "/github",
     callbackUri: config.github.callbackUrl,
     scope: ["read:user", "user:email"],
   });
 
   // Handle callback
   app.get(
-    "/auth/github/callback",
+    "/github/callback",
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
         // Get token from GitHub
@@ -89,10 +89,10 @@ export async function authRoutes(app: FastifyInstance) {
         });
 
         // Redirect to frontend with token
-        reply.redirect(`http://localhost:3000/auth/callback?token=${jwtToken}`);
+        reply.redirect(`http://localhost:5173/auth/callback?token=${jwtToken}`);
       } catch (error) {
         console.error("OAuth error:", error);
-        reply.redirect("http://localhost:3000/auth/error");
+        reply.redirect("http://localhost:5173/auth/error");
       }
     },
   );

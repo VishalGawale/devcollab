@@ -15,28 +15,12 @@ export function RepositoryList() {
   const fetchRepos = async () => {
     try {
       setLoading(true);
-      // Try to fetch from backend - adjust endpoint as needed
+      setError(null);
       const response = await apiClient.get('/repositories');
       setRepos(response.data);
-      setError(null);
     } catch (err: any) {
       console.error('Failed to fetch repos:', err);
-      // Fallback to mock data if endpoint doesn't exist yet
-      setRepos([
-        {
-          id: '1',
-          githubId: '123',
-          name: 'devcollab',
-          fullName: 'VishalGawale/devcollab',
-          description: 'Developer team collaboration platform',
-          private: false,
-          defaultBranch: 'main',
-          lastSyncedAt: new Date().toISOString(),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        }
-      ]);
-      setError(null);
+      setError(err.response?.data?.error || 'Failed to fetch repositories');
     } finally {
       setLoading(false);
     }
@@ -45,12 +29,12 @@ export function RepositoryList() {
   const handleSync = async () => {
     try {
       setSyncing(true);
-      // Call sync endpoint - adjust org name as needed
       await apiClient.post('/github/sync/VishalGawale');
-      await fetchRepos(); // Refresh list
-    } catch (err) {
+      await fetchRepos();
+      alert('✅ Repositories synced successfully!');
+    } catch (err: any) {
       console.error('Sync failed:', err);
-      alert('Sync failed - check console');
+      alert('❌ Sync failed: ' + (err.response?.data?.error || 'Unknown error'));
     } finally {
       setSyncing(false);
     }
@@ -58,13 +42,37 @@ export function RepositoryList() {
 
   if (loading) return (
     <div style={{ padding: '2rem', textAlign: 'center', color: '#718096' }}>
+      <div style={{
+        width: '40px',
+        height: '40px',
+        border: '4px solid #f3f3f3',
+        borderTop: '4px solid #667eea',
+        borderRadius: '50%',
+        animation: 'spin 1s linear infinite',
+        margin: '0 auto 1rem auto'
+      }} />
+      <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
       Loading repositories...
     </div>
   );
   
   if (error) return (
     <div style={{ padding: '2rem', color: '#e53e3e', textAlign: 'center' }}>
-      {error}
+      <p>⚠️ {error}</p>
+      <button 
+        onClick={fetchRepos} 
+        style={{ 
+          marginTop: '1rem', 
+          padding: '0.75rem 1.5rem',
+          backgroundColor: '#667eea',
+          color: 'white',
+          border: 'none',
+          borderRadius: '6px',
+          cursor: 'pointer'
+        }}
+      >
+        🔄 Retry
+      </button>
     </div>
   );
 
@@ -84,28 +92,42 @@ export function RepositoryList() {
         gap: '1rem'
       }}>
         <h2 style={{ margin: 0, color: '#2d3748', fontSize: '1.5rem' }}>
-          📦 Repositories
+          📦 Repositories ({repos.length})
         </h2>
-        <button
-          onClick={handleSync}
-          disabled={syncing}
-          style={{
-            padding: '0.75rem 1.5rem',
-            backgroundColor: syncing ? '#a0aec0' : '#667eea',
-            color: 'white',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: syncing ? 'not-allowed' : 'pointer',
-            fontSize: '1rem',
-            fontWeight: '500',
-            transition: 'all 0.2s',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem'
-          }}
-        >
-          {syncing ? '🔄 Syncing...' : '🔄 Sync from GitHub'}
-        </button>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button
+            onClick={fetchRepos}
+            disabled={loading}
+            style={{
+              padding: '0.75rem 1.5rem',
+              backgroundColor: '#48bb78',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '1rem',
+              fontWeight: 500
+            }}
+          >
+            🔄 Refresh
+          </button>
+          <button
+            onClick={handleSync}
+            disabled={syncing}
+            style={{
+              padding: '0.75rem 1.5rem',
+              backgroundColor: syncing ? '#a0aec0' : '#667eea',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: syncing ? 'not-allowed' : 'pointer',
+              fontSize: '1rem',
+              fontWeight: 500
+            }}
+          >
+            {syncing ? '⏳ Syncing...' : '📥 Sync from GitHub'}
+          </button>
+        </div>
       </div>
       
       {repos.length === 0 ? (
@@ -160,7 +182,7 @@ export function RepositoryList() {
                       backgroundColor: '#feebc8',
                       color: '#c05621',
                       borderRadius: '4px',
-                      fontWeight: '500'
+                      fontWeight: 500
                     }}>
                       Private
                     </span>
@@ -171,7 +193,7 @@ export function RepositoryList() {
                 </p>
                 <div style={{ fontSize: '0.85rem', color: '#a0aec0', display: 'flex', gap: '1rem' }}>
                   <span>🌿 {repo.defaultBranch}</span>
-                  <span>📅 Last synced: {new Date(repo.lastSyncedAt).toLocaleDateString()}</span>
+                  <span>📅 Updated: {new Date(repo.updatedAt).toLocaleDateString()}</span>
                 </div>
               </div>
               <div style={{ textAlign: 'right' }}>
@@ -183,9 +205,8 @@ export function RepositoryList() {
                     color: '#667eea',
                     textDecoration: 'none',
                     fontSize: '0.9rem',
-                    fontWeight: '500'
+                    fontWeight: 500
                   }}
-                  onClick={(e) => e.stopPropagation()}
                 >
                   View on GitHub →
                 </a>
