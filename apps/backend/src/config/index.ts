@@ -10,7 +10,7 @@ const envSchema = z.object({
   DATABASE_URL: z.string(),
   GITHUB_CLIENT_ID: z.string(),
   GITHUB_CLIENT_SECRET: z.string(),
-  GITHUB_CALLBACK_URL: z.string().default('http://localhost:3002/auth/github/callback'),
+  GITHUB_CALLBACK_URL: z.string().default('http://localhost:3002/github/callback'),
   JWT_SECRET: z.string(),
 });
 

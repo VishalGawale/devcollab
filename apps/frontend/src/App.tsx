@@ -4,6 +4,8 @@ import { Layout } from './components/Layout';
 import { RepositoryList } from './components/RepositoryList';
 import { RealTimeStatus } from './components/RealTimeStatus';
 import { AuthCallback } from './pages/AuthCallback';
+import apiClient from './api/client';
+import type { User } from './types';
 
 function Dashboard() {
   return (
@@ -18,17 +20,14 @@ function Dashboard() {
 function Home() {
   const { isAuthenticated, login } = useAuth();
 
-  const handleMockLogin = () => {
-    const mockToken = 'dev-token';
-    const mockUser = {
-      id: '1',
-      name: 'Vishal Gawale',
-      username: 'VishalGawale',
-      email: 'vishal@example.com',
-      avatarUrl: null,
-      githubId: '12345'
-    };
-    login(mockToken, mockUser);
+  const handleMockLogin = async () => {
+    try {
+      const { data } = await apiClient.post<{ token: string; user: User }>('/auth/dev-login');
+      login(data.token, data.user);
+    } catch (error) {
+      console.error('Dev login failed:', error);
+      alert('Dev login failed. Is the backend running?');
+    }
   };
 
   if (isAuthenticated) {
@@ -68,7 +67,7 @@ function Home() {
           🔑 Mock Login (Dev Only)
         </button>
         
-        <a href="http://localhost:3002/auth/github" style={{
+        <a href="http://localhost:3002/github" style={{
           padding: '1rem 2rem',
           backgroundColor: '#24292e',
           color: 'white',

@@ -11,6 +11,10 @@ interface GitHubRepo {
   updated_at: string;
 }
 
+interface GitHubAccount {
+  type: "User" | "Organization";
+}
+
 export class GitHubService {
   private token: string;
 
@@ -18,12 +22,16 @@ export class GitHubService {
     this.token = token;
   }
 
+  private githubHeaders() {
+    return {
+      Authorization: `Bearer ${this.token}`,
+      Accept: "application/vnd.github.v3+json",
+    };
+  }
+
   async getUser() {
     const response = await fetch("https://api.github.com/user", {
-      headers: {
-        Authorization: `Bearer ${this.token}`,
-        Accept: "application/vnd.github.v3+json",
-      },
+      headers: this.githubHeaders(),
     });
 
     if (!response.ok) {
@@ -40,10 +48,7 @@ export class GitHubService {
   // Fetch user's organizations
   async getOrganizations() {
     const response = await fetch("https://api.github.com/user/orgs", {
-      headers: {
-        Authorization: `Bearer ${this.token}`,
-        Accept: "application/vnd.github.v3+json",
-      },
+      headers: this.githubHeaders(),
     });
 
     if (!response.ok) {
@@ -63,10 +68,47 @@ export class GitHubService {
       const response = await fetch(
         `https://api.github.com/orgs/${org}/repos?per_page=100&page=${page}`,
         {
-          headers: {
-            Authorization: `Bearer ${this.token}`,
-            Accept: "application/vnd.github.v3+json",
-          },
+          headers: this.githubHeaders(),
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error(`GitHub API error: ${response.status}`);
+      }
+
+      const data = (await response.json()) as GitHubRepo[];
+      repos.push(...data);
+
+      hasMore = data.length === 100;
+      page++;
+    }
+
+    return repos;
+  }
+
+  async getAccountType(name: string): Promise<GitHubAccount["type"]> {
+    const response = await fetch(`https://api.github.com/users/${name}`, {
+      headers: this.githubHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error(`GitHub API error: ${response.status}`);
+    }
+
+    const account = (await response.json()) as GitHubAccount;
+    return account.type;
+  }
+
+  async getUserRepositories(username: string) {
+    const repos: GitHubRepo[] = [];
+    let page = 1;
+    let hasMore = true;
+
+    while (hasMore) {
+      const response = await fetch(
+        `https://api.github.com/users/${username}/repos?per_page=100&page=${page}`,
+        {
+          headers: this.githubHeaders(),
         },
       );
 
@@ -85,8 +127,12 @@ export class GitHubService {
   }
 
   // Sync repositories to database
-  async syncRepositories(org: string, teamId: string) {
-    const repos = await this.getOrgRepositories(org);
+  async syncRepositories(name: string, teamId: string) {
+    const accountType = await this.getAccountType(name);
+    const repos =
+      accountType === "Organization"
+        ? await this.getOrgRepositories(name)
+        : await this.getUserRepositories(name);
 
     const operations = repos.map(async (repo) => {
       return prisma.repository.upsert({
