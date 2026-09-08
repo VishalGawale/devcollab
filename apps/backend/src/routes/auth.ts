@@ -1,6 +1,5 @@
-﻿import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
+import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import oauth2 from "@fastify/oauth2";
-import jwt from "@fastify/jwt";
 import { config } from "../config";
 import { prisma } from "../utils/prisma";
 
@@ -24,11 +23,6 @@ interface GitHubUser {
 }
 
 export async function authRoutes(app: FastifyInstance) {
-  // Register JWT
-  await app.register(jwt, {
-    secret: config.session.jwtSecret,
-  });
-
   // Register OAuth2 for GitHub
   await app.register(oauth2, {
     name: "githubOAuth",
@@ -103,25 +97,4 @@ export async function authRoutes(app: FastifyInstance) {
     },
   );
 
-  // Protected route example
-  app.get("/me", async (request: FastifyRequest, reply: FastifyReply) => {
-    try {
-      await request.jwtVerify();
-      const { userId } = request.user as { userId: string };
-
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-      });
-
-      if (!user) {
-        reply.status(404);
-        return { error: "User not found" };
-      }
-
-      return user;
-    } catch (err) {
-      reply.status(401);
-      return { error: "Unauthorized" };
-    }
-  });
 }

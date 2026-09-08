@@ -3,7 +3,7 @@ import { GitHubService } from "../services/github";
 
 export async function githubRoutes(app: FastifyInstance) {
   // GET /github/test - Simple test
-  app.get("/github/test", async (request, reply) => {
+  app.get("/test", async (request, reply) => {
     try {
       const authHeader = request.headers.authorization;
       if (!authHeader) {
@@ -12,25 +12,8 @@ export async function githubRoutes(app: FastifyInstance) {
       }
 
       const token = authHeader.replace("Bearer ", "");
-
-      const response = await fetch("https://api.github.com/user", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/vnd.github.v3+json",
-        },
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        return {
-          error: "GitHub API error",
-          status: response.status,
-          details: errorText,
-        };
-      }
-
-      const user = (await response.json()) as { login: string; id: number };
-      return { message: "GitHub API working!", login: user.login, id: user.id };
+      const github = new GitHubService(token);
+      return github.getUser();
     } catch (error) {
       reply.status(500);
       return { error: "Failed", message: (error as Error).message };
@@ -38,7 +21,7 @@ export async function githubRoutes(app: FastifyInstance) {
   });
 
   // GET /github/orgs - List organizations
-  app.get("/github/orgs", async (request, reply) => {
+  app.get("/orgs", async (request, reply) => {
     try {
       const authHeader = request.headers.authorization;
       if (!authHeader) {
@@ -61,7 +44,7 @@ export async function githubRoutes(app: FastifyInstance) {
   });
 
   // POST /github/sync/:org - Sync repositories
-  app.post("/github/sync/:org", async (request, reply) => {
+  app.post("/sync/:org", async (request, reply) => {
     try {
       const { org } = request.params as { org: string };
 

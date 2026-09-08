@@ -18,6 +18,25 @@ export class GitHubService {
     this.token = token;
   }
 
+  async getUser() {
+    const response = await fetch("https://api.github.com/user", {
+      headers: {
+        Authorization: `Bearer ${this.token}`,
+        Accept: "application/vnd.github.v3+json",
+      },
+    });
+
+    if (!response.ok) {
+      const error = new Error(`GitHub API error: ${response.status}`) as Error & {
+        statusCode: number;
+      };
+      error.statusCode = response.status;
+      throw error;
+    }
+
+    return response.json();
+  }
+
   // Fetch user's organizations
   async getOrganizations() {
     const response = await fetch("https://api.github.com/user/orgs", {

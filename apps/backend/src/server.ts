@@ -1,4 +1,6 @@
 ﻿import Fastify from 'fastify';
+import jwt from '@fastify/jwt';
+import { config } from './config';
 import { prisma } from './utils/prisma';
 import { userRoutes } from './routes/users';
 import { authRoutes } from './routes/auth';
@@ -21,10 +23,30 @@ app.get('/health/db', async () => {
   }
 });
 
+app.register(jwt, { secret: config.session.jwtSecret });
+
+app.get('/me', async (request, reply) => {
+  try {
+    await request.jwtVerify();
+    const { userId } = request.user as { userId: string };
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+
+    if (!user) {
+      reply.status(404);
+      return { error: 'User not found' };
+    }
+
+    return user;
+  } catch (error) {
+    reply.status(401);
+    return { error: 'Unauthorized' };
+  }
+});
+
 // API Routes
 app.register(userRoutes, { prefix: '/users' });
 app.register(authRoutes);
-app.register(githubRoutes);
+app.register(githubRoutes, { prefix: '/github' });
 
 app.listen({ port: 3002, host: '0.0.0.0' }, (err) => {
   if (err) {
