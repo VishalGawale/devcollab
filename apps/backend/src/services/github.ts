@@ -23,10 +23,11 @@ export class GitHubService {
   }
 
   private githubHeaders() {
-    return {
-      Authorization: `Bearer ${this.token}`,
+    const headers = {
+      Authorization: `token ${this.token}`,
       Accept: "application/vnd.github.v3+json",
     };
+    return headers;
   }
 
   async getUser() {

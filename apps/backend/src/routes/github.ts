@@ -1,16 +1,28 @@
 import { FastifyInstance } from "fastify";
 import { GitHubService } from "../services/github";
 
+interface SessionPayload {
+  githubToken?: string;
+}
+
+async function getGitHubToken(request: {
+  jwtVerify: () => Promise<unknown>;
+  user: unknown;
+}) {
+  await request.jwtVerify();
+  const { githubToken } = request.user as SessionPayload;
+
+  if (!githubToken) {
+    throw new Error("GitHub token missing from session");
+  }
+
+  return githubToken;
+}
+
 export async function githubRoutes(app: FastifyInstance) {
   app.get("/test", async (request, reply) => {
     try {
-      const authHeader = request.headers.authorization;
-      if (!authHeader) {
-        reply.status(401);
-        return { error: "No authorization header" };
-      }
-
-      const token = authHeader.replace("Bearer ", "");
+      const token = await getGitHubToken(request);
       const github = new GitHubService(token);
       return github.getUser();
     } catch (error) {
@@ -21,13 +33,7 @@ export async function githubRoutes(app: FastifyInstance) {
 
   app.get("/orgs", async (request, reply) => {
     try {
-      const authHeader = request.headers.authorization;
-      if (!authHeader) {
-        reply.status(401);
-        return { error: "No authorization header" };
-      }
-
-      const token = authHeader.replace("Bearer ", "");
+      const token = await getGitHubToken(request);
       const github = new GitHubService(token);
       return github.getOrganizations();
     } catch (error) {
@@ -44,13 +50,7 @@ export async function githubRoutes(app: FastifyInstance) {
     app.log.info({ org }, "Starting GitHub sync for org");
 
     try {
-      const authHeader = request.headers.authorization;
-      if (!authHeader) {
-        reply.status(401);
-        return { error: "No authorization header" };
-      }
-
-      const token = authHeader.replace("Bearer ", "");
+      const token = await getGitHubToken(request);
       const github = new GitHubService(token);
       const repos = await github.syncRepositories(org, "placeholder-team-id");
 
