@@ -1,5 +1,5 @@
 ![CI](https://github.com/VishalGawale/devcollab/actions/workflows/ci.yml/badge.svg)
-# DevCollab — GitHub repository sync and WebSocket dashboard for engineering teams
+# DevCollab : GitHub repository sync and WebSocket dashboard for engineering teams
 
 Unified dashboard for engineering teams to authenticate with GitHub, sync repositories, and view WebSocket connection status in one place.
 
