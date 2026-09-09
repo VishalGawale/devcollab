@@ -5,7 +5,7 @@ Unified dashboard for engineering teams to authenticate with GitHub, sync reposi
 
 *(Screenshot: real dashboard showing synced repositories)*
 
-![Dashboard Screenshot](docs/screenshot.png)
+![Dashboard Screenshot](docs/DevCollab_Dashboard.png)
 
 ## Tech Stack
 
