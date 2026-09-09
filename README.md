@@ -50,6 +50,8 @@ frontend with a signed JWT session token.
 - Repository dashboard with refresh, sync, repository metadata, and GitHub links.
 - Native WebSocket connection status and welcome/echo messages at `/ws/updates`.
 - GitHub Actions CI that installs dependencies, generates Prisma Client, and builds both apps.
+- Fully containerized application (backend, frontend, PostgreSQL, and Redis) with one-command startup.
+- CI verifies that both Docker images build successfully.
 
 The current WebSocket implementation reports connection/message status; it does
 not yet stream GitHub Actions or CI events.
@@ -64,53 +66,54 @@ not yet stream GitHub Actions or CI events.
 
 ### Setup
 
+Docker Compose starts the entire stack—PostgreSQL, Redis, backend, and frontend—with
+one command. This is a meaningful improvement over the previous manual
+multi-terminal setup.
+
 ```bash
 git clone <repo>
 cd devcollab
-docker-compose up -d
-```
-
-Copy the backend environment template and fill in the required values before
-running Prisma or the backend:
-
-```bash
 copy apps\backend\.env.example apps\backend\.env
 ```
 
-At minimum, configure `DATABASE_URL`, `GITHUB_CLIENT_ID`,
-`GITHUB_CLIENT_SECRET`, `GITHUB_CALLBACK_URL`, and `JWT_SECRET`. For the
-default local server, use:
-
-```env
-PORT=3002
-GITHUB_CALLBACK_URL=http://localhost:3002/github/callback
-```
-
-Install, migrate, and start the backend:
+Fill in `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `GITHUB_CALLBACK_URL`, and
+`JWT_SECRET` in `apps\backend\.env`, then build and start everything:
 
 ```bash
-cd apps/backend
-npm install
-npx prisma migrate dev
-npm run dev
+docker-compose up -d --build
+docker-compose exec backend npx prisma migrate deploy
 ```
 
-In a second terminal, install and start the frontend:
+Open `http://localhost:5173`.
 
-```bash
-cd apps/frontend
-npm install
-npm run dev
-```
-
-Open the Vite URL shown in the terminal, usually
-`http://localhost:5173`. The optional Adminer database UI is available with:
+The optional Adminer database UI is available with:
 
 ```bash
 docker-compose --profile tools up -d
 ```
 
 Then visit `http://localhost:8080`.
+
+### Local development without Docker
+
+Docker rebuilds are slower for iterative coding. For hot-reload development,
+run the backend and frontend separately:
+
+```bash
+cd apps\backend
+npm install
+npx prisma migrate dev
+npm run dev
+```
+
+```bash
+cd apps\frontend
+npm install
+npm run dev
+```
+
+The backend uses `ts-node-dev` for hot reload and the frontend uses the Vite
+development server at `http://localhost:5173`.
 
 ## Roadmap
 
@@ -122,6 +125,9 @@ Then visit `http://localhost:8080`.
 - GitHub personal-account and organization repository sync.
 - CI pipeline for backend and frontend builds.
 - Docker Compose local PostgreSQL, Redis, and optional Adminer stack.
+- Docker Compose local stack for the full application.
+- Fully containerized backend and frontend with one-command startup.
+- CI verification that both Docker images build successfully.
 
 ### ⏳ Planned
 
