@@ -1,5 +1,7 @@
 ﻿import { prisma } from "../utils/prisma";
 
+export const DEFAULT_TEAM_ID = "default-team-id";
+
 interface GitHubRepo {
   id: number;
   name: string;
@@ -129,6 +131,15 @@ export class GitHubService {
 
   // Sync repositories to database
   async syncRepositories(name: string, teamId: string) {
+    await prisma.team.upsert({
+      where: { id: teamId },
+      update: {},
+      create: {
+        id: teamId,
+        name: "Default Team",
+      },
+    });
+
     const accountType = await this.getAccountType(name);
     const repos =
       accountType === "Organization"

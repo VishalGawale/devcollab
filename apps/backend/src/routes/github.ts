@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import { GitHubService } from "../services/github";
+import { DEFAULT_TEAM_ID, GitHubService } from "../services/github";
 
 interface SessionPayload {
   githubToken?: string;
@@ -52,7 +52,7 @@ export async function githubRoutes(app: FastifyInstance) {
     try {
       const token = await getGitHubToken(request);
       const github = new GitHubService(token);
-      const repos = await github.syncRepositories(org, "placeholder-team-id");
+      const repos = await github.syncRepositories(org, DEFAULT_TEAM_ID);
 
       reply.status(201);
       return {

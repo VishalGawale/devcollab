@@ -29,3 +29,13 @@ jobs:
         run: |
           npm ci
           npm run build
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build backend image
+        run: docker build -f apps/backend/Dockerfile -t devcollab-backend:ci apps/backend
+      - name: Build frontend image
+        run: docker build -f apps/frontend/Dockerfile -t devcollab-frontend:ci apps/frontend
