@@ -1,4 +1,5 @@
 ﻿import { useEffect, useRef, useState, useCallback } from 'react';
+import { WEBSOCKET_URL } from '../config';
 
 interface WebSocketMessage {
   type: string;
@@ -13,7 +14,7 @@ export function useWebSocket() {
   const ws = useRef<WebSocket | null>(null);
 
   useEffect(() => {
-    const WS_URL = 'ws://localhost:3002/ws/updates';
+    const WS_URL = `${WEBSOCKET_URL}/ws/updates`;
     
     console.log('Connecting to WebSocket:', WS_URL);
     ws.current = new WebSocket(WS_URL);

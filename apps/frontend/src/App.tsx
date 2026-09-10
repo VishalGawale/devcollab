@@ -6,6 +6,7 @@ import { RealTimeStatus } from './components/RealTimeStatus';
 import { AuthCallback } from './pages/AuthCallback';
 import apiClient from './api/client';
 import type { User } from './types';
+import { API_BASE_URL } from './config';
 
 function Dashboard() {
   return (
@@ -67,7 +68,7 @@ function Home() {
           🔑 Mock Login (Dev Only)
         </button>
         
-        <a href="http://localhost:3002/github" style={{
+        <a href={`${API_BASE_URL}/github`} style={{
           padding: '1rem 2rem',
           backgroundColor: '#24292e',
           color: 'white',
