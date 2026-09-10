@@ -118,10 +118,14 @@ export async function authRoutes(app: FastifyInstance) {
         });
 
         // Redirect to frontend with token
-        reply.redirect(`http://localhost:5173/auth/callback?token=${jwtToken}`);
+        reply.redirect(
+          `https://devcollab-backend-lzqx.onrender.com/github/callback?token=${jwtToken}`,
+        );
       } catch (error) {
         console.error("OAuth error:", error);
-        reply.redirect("http://localhost:5173/auth/error");
+        reply.redirect(
+          "https://devcollab-backend-lzqx.onrender.com/github/error",
+        );
       }
     },
   );
