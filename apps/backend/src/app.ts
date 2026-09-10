@@ -13,7 +13,10 @@ export async function buildApp() {
   });
 
   await app.register(helmet, { contentSecurityPolicy: false });
-  await app.register(cors, { origin: true, credentials: true });
+  await app.register(cors, {
+    origin: config.frontendUrl,
+    credentials: true,
+  });
   await app.register(rateLimit, { max: 100, timeWindow: '1 minute' });
   await app.register(jwt, { secret: config.session.jwtSecret });
 

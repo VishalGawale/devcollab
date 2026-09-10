@@ -17,7 +17,7 @@ const app = Fastify({ logger: true });
 async function start() {
   await app.register(helmet, { contentSecurityPolicy: false });
   await app.register(cors, {
-    origin: "http://localhost:5173",
+    origin: config.frontendUrl,
     credentials: true,
   });
   await app.register(rateLimit, { max: 100, timeWindow: "1 minute" });
