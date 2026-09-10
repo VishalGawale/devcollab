@@ -11,6 +11,7 @@ const envSchema = z.object({
   GITHUB_CLIENT_ID: z.string(),
   GITHUB_CLIENT_SECRET: z.string(),
   GITHUB_CALLBACK_URL: z.string().default('http://localhost:3002/github/callback'),
+  FRONTEND_URL: z.string().default('http://localhost:5173'),
   JWT_SECRET: z.string(),
 });
 
@@ -26,6 +27,7 @@ export const config = {
     clientSecret: env.GITHUB_CLIENT_SECRET,
     callbackUrl: env.GITHUB_CALLBACK_URL,
   },
+  frontendUrl: env.FRONTEND_URL,
   session: {
     jwtSecret: env.JWT_SECRET,
   },

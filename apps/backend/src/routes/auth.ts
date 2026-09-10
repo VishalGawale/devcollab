@@ -119,13 +119,11 @@ export async function authRoutes(app: FastifyInstance) {
 
         // Redirect to frontend with token
         reply.redirect(
-          `https://devcollab-backend-lzqx.onrender.com/github/callback?token=${jwtToken}`,
+          `${config.frontendUrl}/auth/callback?token=${jwtToken}`,
         );
       } catch (error) {
         console.error("OAuth error:", error);
-        reply.redirect(
-          "https://devcollab-backend-lzqx.onrender.com/github/error",
-        );
+        reply.redirect(`${config.frontendUrl}/?error=oauth_failed`);
       }
     },
   );
