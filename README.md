@@ -73,7 +73,7 @@ one command. This is a meaningful improvement over the previous manual
 multi-terminal setup.
 
 ```bash
-git clone <repo>
+git clone https://github.com/VishalGawale/devcollab.git
 cd devcollab
 copy apps\backend\.env.example apps\backend\.env
 ```
