@@ -1,7 +1,9 @@
 ![CI](https://github.com/VishalGawale/devcollab/actions/workflows/ci.yml/badge.svg)
-# DevCollab : GitHub repository sync and WebSocket dashboard for engineering teams
+# DevCollab: GitHub repository sync and WebSocket connection-status dashboard
 
-Unified dashboard for engineering teams to authenticate with GitHub, sync repositories, and view WebSocket connection status in one place.
+DevCollab is a full-stack developer-tooling application that centralises GitHub authentication, repository synchronisation, and connection-status visibility in one dashboard.
+
+It demonstrates OAuth integration, JWT-based session handling, external API integration, PostgreSQL persistence, native WebSocket communication, Docker Compose-based local environments, and GitHub Actions build validation.
 
 *(Screenshot: real dashboard showing synced repositories)*
 
@@ -11,14 +13,15 @@ Unified dashboard for engineering teams to authenticate with GitHub, sync reposi
 
 | Technology | Version / role | Why |
 | --- | --- | --- |
-| React + Vite | React 19.2, Vite 7.3 | Vite provides a fast development server and production bundling for the React client. |
-| Fastify | 5.7 | Fastify offers a small, plugin-based HTTP server with lower abstraction overhead than Express for this API. |
-| TypeScript | 5.9, strict mode | Strict typing catches integration errors across the frontend, backend, Prisma client, and API payloads before runtime. |
-| Prisma | 5.22 | Prisma provides typed database queries and migrations without hand-written SQL or the heavier mapping layer of a traditional ORM. |
-| PostgreSQL | 16 Alpine in Docker | PostgreSQL supplies relational constraints and durable storage for users, teams, and repositories. |
-| Native WebSocket | `@fastify/websocket` 11.2 and browser WebSocket | Native WebSocket keeps the current connection-status and echo feature simple without adding a server-side Socket.IO protocol layer. |
-| Redis | 7 Alpine in Docker | Redis is included in the local stack for future caching or real-time coordination, but is not yet consumed by the application code. |
-| GitHub OAuth/API | `@fastify/oauth2` 8.2 | GitHub OAuth avoids storing passwords, while the GitHub API supplies account and repository data for synchronization. |
+| React + Vite | React 19.2, Vite 7.3 | React provides the dashboard UI; Vite provides the development server and client build. |
+| Fastify | 5.7 | Plugin-based HTTP server with low abstraction overhead and strong TypeScript support. |
+| TypeScript | 5.9, strict mode | Strict typing helps catch integration errors across frontend, backend, Prisma, and API payloads. |
+| Prisma | 5.22 | Typed database access and migration support for the PostgreSQL data model. |
+| PostgreSQL | 16 Alpine in Docker | Relational persistence for users, teams, and repositories, with database constraints. |
+| Native WebSocket | `@fastify/websocket` 11.2 and browser WebSocket | Lightweight connection-status and welcome/echo messaging without Socket.IO. |
+| GitHub OAuth/API | `@fastify/oauth2` 8.2 | OAuth avoids password storage; the GitHub API supplies account and repository data for synchronisation. |
+| Docker Compose | Local development and integration environment | Reproducible startup for the frontend, backend, and PostgreSQL services. |
+| GitHub Actions | CI build validation | Installs dependencies, generates Prisma Client, builds both applications, and verifies Docker image builds. |
 
 ## Architecture
 
@@ -32,30 +35,28 @@ Fastify backend
   |-- JWT session validation
   |-- Native WebSocket endpoint: /ws/updates
   |
-  |--> PostgreSQL (users, teams, repositories)
-  `--> Redis (provisioned local service; reserved for future use)
+  `--> PostgreSQL (users, teams, repositories)
 ```
 
-The OAuth flow starts at `GET /github`, returns through
-`GET /github/callback`, creates or updates a local user, and redirects the
-frontend with a signed JWT session token.
+The OAuth flow starts at GET /github, returns through
+GET /github/callback, creates or updates a local user, and returns a signed
+JWT session token to the frontend for authenticated API requests.
 
 ## Features
 
-- GitHub OAuth login and OAuth callback handling.
+- GitHub OAuth login and callback handling.
 - JWT session tokens and a protected `/me` endpoint.
-- Development-only login through `POST /auth/dev-login`.
-- GitHub account detection for personal users and organizations.
-- Repository synchronization from a personal GitHub account or organization.
-- PostgreSQL persistence for users, teams, and synced repositories.
-- Repository dashboard with refresh, sync, repository metadata, and GitHub links.
-- Native WebSocket connection status and welcome/echo messages at `/ws/updates`.
-- GitHub Actions CI that installs dependencies, generates Prisma Client, and builds both apps.
-- Fully containerized application (backend, frontend, PostgreSQL, and Redis) with one-command startup.
-- CI verifies that both Docker images build successfully.
+- Development-only login for local testing; not intended for hosted use.
+- GitHub account detection for personal users and organisations.
+- Repository synchronisation for personal GitHub accounts and organisations.
+- PostgreSQL persistence for users, teams, and synchronised repositories.
+- Repository dashboard with refresh, synchronisation, metadata, and GitHub links.
+- Native WebSocket connection-status and welcome/echo messages.
+- GitHub Actions CI for dependency installation, Prisma Client generation, application builds, and Docker image-build verification.
+- Docker Compose workflow for the frontend, backend, and PostgreSQL services.
 
-The current WebSocket implementation reports connection/message status; it does
-not yet stream GitHub Actions or CI events.
+The current WebSocket implementation reports connection and message status. It
+does not yet stream GitHub Actions or CI events.
 
 ## Quick Start
 
@@ -118,23 +119,23 @@ development server at `http://localhost:5173`.
 
 ## Roadmap
 
-### ✅ Done
+### Done
 
 - GitHub OAuth login and JWT sessions.
-- WebSocket-backed real-time connection/status dashboard panel.
+- WebSocket connection-status dashboard.
 - Prisma/PostgreSQL data model and repository persistence.
-- GitHub personal-account and organization repository sync.
-- CI pipeline for backend and frontend builds.
-- Docker Compose local PostgreSQL, Redis, and optional Adminer stack.
-- Docker Compose local stack for the full application.
-- Fully containerized backend and frontend with one-command startup.
-- CI verification that both Docker images build successfully.
+- GitHub personal-account and organisation repository synchronisation.
+- Docker Compose local environment for the frontend, backend, and PostgreSQL.
+- GitHub Actions build validation for both applications.
+- Docker image-build verification.
 
-### ⏳ Planned
+### Planned
 
+- Automated unit and integration tests.
+- GitHub Actions or CI-event ingestion.
+- Live CI status updates in the dashboard.
 - Kubernetes deployment.
 - Terraform/IaC.
 - GitOps workflows.
-- Prometheus/Grafana observability.
-- Automated unit and integration tests.
-- GitHub Actions/CI event ingestion and live status updates.
+- Production-style metrics, logging, and alerting.
+- Optional Redis-backed caching or coordination if future requirements justify it.
