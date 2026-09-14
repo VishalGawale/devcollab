@@ -78,8 +78,24 @@ cd devcollab
 copy apps\backend\.env.example apps\backend\.env
 ```
 
-Fill in `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `GITHUB_CALLBACK_URL`, and
-`JWT_SECRET` in `apps\backend\.env`, then build and start everything:
+Fill in the required values in `apps\backend\.env` before starting the stack:
+
+- `DATABASE_URL`: PostgreSQL pooled connection string.
+- `DATABASE_URL_UNPOOLED`: direct PostgreSQL connection string used by Prisma migrations.
+- `GITHUB_CLIENT_ID`
+- `GITHUB_CLIENT_SECRET`
+- `GITHUB_CALLBACK_URL`
+- `FRONTEND_URL`: frontend URL used for OAuth redirects and CORS.
+- `JWT_SECRET`
+
+For local Docker development, use:
+
+```env
+GITHUB_CALLBACK_URL=http://localhost:3002/github/callback
+FRONTEND_URL=http://localhost:5173
+```
+
+Then build and start everything:
 
 ```bash
 docker-compose up -d --build
@@ -115,7 +131,10 @@ npm run dev
 ```
 
 The backend uses `ts-node-dev` for hot reload and the frontend uses the Vite
-development server at `http://localhost:5173`.
+development server at `http://localhost:5173`. If you configure the frontend
+environment explicitly, set `VITE_API_URL=http://localhost:3002` in
+`apps\frontend\.env`; when omitted, the frontend uses that URL as its local
+development fallback.
 
 ## Roadmap
 
